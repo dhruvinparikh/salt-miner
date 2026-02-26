@@ -1,0 +1,10 @@
+[package]
+name = "mine-zksync-salt"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tiny-keccak = { version = "2.0", features = ["keccak"] }
+rayon = "1.10"
+hex = "0.4"
+clap = { version = "4", features = ["derive"] }
