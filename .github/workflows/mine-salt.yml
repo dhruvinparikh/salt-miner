@@ -1,0 +1,50 @@
+name: Mine zkSync CREATE2 Salt
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_address:
+        description: "Target proxy address"
+        required: true
+        default: "0x0000006D38568b00B457580b734e0076C62de659"
+      deployer_address:
+        description: "CREATE2 deployer address (Nick's Factory)"
+        required: true
+        default: "0x4e59b44847b379578588920cA78FbF26c0B4956C"
+      bytecode_hash:
+        description: "zkSync bytecode hash of FraxUpgradeableProxy"
+        required: true
+        default: "0x010000cfc5ec4899fe1afb5ee91e52433aa1089de03eb4fbe3dbb67dc1a6f55a"
+      implementation_address:
+        description: "Implementation address (RemoteHopV2)"
+        required: true
+        default: "0x0000000087ED0dD8b999aE6C7c30f95e9707a3C6"
+      admin_address:
+        description: "Proxy admin (EOA / msg.sender)"
+        required: true
+        default: "0x54f9b12743a7deec0ea48721683cbebedc6e17bc"
+
+jobs:
+  mine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build release binary
+        run: cargo build --release
+
+      - name: Mine salt
+        run: |
+          ./target/release/mine-zksync-salt \
+            --target "${{ github.event.inputs.target_address }}" \
+            --deployer "${{ github.event.inputs.deployer_address }}" \
+            --bytecode-hash "${{ github.event.inputs.bytecode_hash }}" \
+            --implementation "${{ github.event.inputs.implementation_address }}" \
+            --admin "${{ github.event.inputs.admin_address }}"
