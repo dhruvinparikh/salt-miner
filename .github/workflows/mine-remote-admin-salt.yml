@@ -1,0 +1,51 @@
+name: Mine RemoteAdmin Salt
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_address:
+        description: "Target RemoteAdmin address"
+        required: true
+        default: "0x954286118E93df807aB6f99aE0454f8710f0a8B9"
+      deployer_address:
+        description: "CREATE2 deployer address (Nick's Factory)"
+        required: true
+        default: "0x4e59b44847b379578588920cA78FbF26c0B4956C"
+      bytecode_hash:
+        description: "zkSync bytecode hash of RemoteAdmin"
+        required: true
+        default: "0x0100008bc5b4435f4bf1420fec25c30c5d5a001616032a936e255af46b1a2fd8"
+      frxusd_oft:
+        description: "frxUSD OFT address"
+        required: true
+        default: "0xEa77c590Bb36c43ef7139cE649cFBCFD6163170d"
+      remote_hop:
+        description: "RemoteHop proxy address"
+        required: true
+        default: "0x0000006D38568b00B457580b734e0076C62de659"
+      msig:
+        description: "Multisig address"
+        required: true
+        default: "0x5f25218ed9474b721d6a38c115107428E832fA2E"
+
+jobs:
+  mine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+      - name: Build release binary
+        run: cargo build --release
+      - name: Mine salt
+        run: |
+          ./target/release/mine-zksync-salt remote-admin \
+            --target "${{ github.event.inputs.target_address }}" \
+            --deployer "${{ github.event.inputs.deployer_address }}" \
+            --bytecode-hash "${{ github.event.inputs.bytecode_hash }}" \
+            --frxusd-oft "${{ github.event.inputs.frxusd_oft }}" \
+            --remote-hop "${{ github.event.inputs.remote_hop }}" \
+            --msig "${{ github.event.inputs.msig }}"

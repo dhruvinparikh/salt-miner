@@ -1,4 +1,4 @@
-name: Mine zkSync CREATE2 Salt
+name: Mine FraxUpgradeableProxy Salt
 
 on:
   workflow_dispatch:
@@ -30,19 +30,15 @@ jobs:
     timeout-minutes: 360
     permissions:
       contents: read
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
-
       - name: Build release binary
         run: cargo build --release
-
       - name: Mine salt
         run: |
-          ./target/release/mine-zksync-salt \
+          ./target/release/mine-zksync-salt proxy \
             --target "${{ github.event.inputs.target_address }}" \
             --deployer "${{ github.event.inputs.deployer_address }}" \
             --bytecode-hash "${{ github.event.inputs.bytecode_hash }}" \
